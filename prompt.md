@@ -99,53 +99,113 @@
 
 ### 確認完了後、以下の設計原則でXMLを生成：
 
-#### 設計原則
-1. **レイアウト構造**
-   - スイムレーン構造（役割別にレーン分け）
-   - 左から右への一方通行フロー
-   - A4横向き（16:9）想定のサイズ
+#### 【重要】レイアウト設計原則
+1. **スイムレーンの構成**
+   - タイトルエリア：高さ60px（業務名と日付）
+   - 各スイムレーン：最小高さ150px
+   - レーン名は左側に配置（幅120px）
+   - レーン間の境界線は明確に
 
-2. **矢印・接続線**
-   - 縦横線のみ（斜め線禁止）
-   - edgeStyle=orthogonalEdgeStyle
+2. **座標系とグリッド**
+   - 左上を(0,0)として座標計算
    - グリッド10px単位で配置
+   - 各要素間は最小30px空ける
 
-3. **要素配置**
-   - プロセス：角丸四角形
-   - 判断：ひし形
-   - データ：平行四辺形
-   - 開始/終了：角丸四角形（色分け）
+3. **要素配置ルール**
+   - **開始/終了**: 角丸四角形（fillColor="#d5e8d4" or "#f8cecc"）
+   - **プロセス**: 角丸四角形（fillColor="#dae8fc", rounded="1"）
+   - **判断**: ひし形（rhombus, fillColor="#ffe6cc"）
+   - **データ/文書**: 平行四辺形（fillColor="#e1d5e7"）
+   - **外部プロセス**: 角丸四角形（strokeStyle="dashed"）
 
-4. **視覚的要素**
-   - 部門別色分け
-   - フォントサイズ：タイトル20pt、本文12pt以上
-   - 重要事項は注釈ボックスで表示
+4. **サイズ規定**
+   - プロセスボックス：幅120-150px、高さ60-80px
+   - 判断ひし形：幅100px、高さ80px
+   - テキスト：fontSize="12"（タイトルは"14"）
+   - 矢印：strokeWidth="2"
 
-### XMLテンプレート構造
+5. **接続線のルール**
+   - edgeStyle="orthogonalEdgeStyle"（直角線のみ）
+   - rounded="0"（カクカクした線）
+   - 線の色：strokeColor="#000000"
+   - 分岐はラベル付き（YES/NO等）
+
+### XMLテンプレート構造（改善版）
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="[日付]" agent="5.0" version="21.1.2">
-  <diagram name="[業務名]" id="[ID]">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="5.0" version="21.1.2">
+  <diagram name="[業務名]" id="workflow-diagram">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- スイムレーン -->
-        [各レーンのXMLコード]
-        
-        <!-- プロセス要素 -->
-        [各プロセスのXMLコード]
-        
-        <!-- 接続線 -->
-        [矢印のXMLコード]
-        
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- タイトルエリア -->
+        <mxCell id="title" value="[業務名]" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="10" width="200" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- スイムレーンコンテナ -->
+        <mxCell id="swimlane-container" value="" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=0;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="0" y="60" width="1169" height="[計算された高さ]" as="geometry"/>
+        </mxCell>
+
+        <!-- 各スイムレーン -->
+        <mxCell id="lane-[番号]" value="[部門名]" style="swimlane;horizontal=0;startSize=120;fillColor=#[色コード];strokeColor=#000000;" vertex="1" parent="swimlane-container">
+          <mxGeometry x="0" y="[Y座標]" width="1169" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- プロセス要素の例 -->
+        <mxCell id="process-[番号]" value="[プロセス名]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="lane-[番号]">
+          <mxGeometry x="[X座標]" y="[Y座標]" width="140" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- 判断要素の例 -->
+        <mxCell id="decision-[番号]" value="[判断内容]" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="lane-[番号]">
+          <mxGeometry x="[X座標]" y="[Y座標]" width="100" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- 接続線の例 -->
+        <mxCell id="edge-[番号]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1" source="[元ID]" target="[先ID]">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="[中継点X]" y="[中継点Y]"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 分岐ラベル -->
+        <mxCell id="label-[番号]" value="YES/NO" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge-[番号]">
+          <mxGeometry x="0" y="0" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
       </root>
     </mxGraphModel>
   </diagram>
 </mxfile>
 ```
+
+### 生成時の注意事項
+
+1. **座標計算の精密化**
+   - 各要素のX座標：レーン開始位置(120) + (要素番号 × 170)
+   - 各要素のY座標：レーン内で垂直中央に配置
+   - スイムレーン間の要素は中継点を使って接続
+
+2. **ID管理**
+   - 一意のIDを付与（process-1, decision-1, edge-1等）
+   - source/targetは正確なIDを指定
+
+3. **色の使い分け**
+   - 各部門/レーンごとに背景色を変える
+   - プロセスタイプごとに統一した色を使用
+
+4. **テキスト処理**
+   - 長いテキストは改行（&#xa;）を使用
+   - 日本語は適切にエンコード
 
 ## 対話の進め方
 
@@ -154,3 +214,4 @@
 3. **段階的に詳細化**（最初は大まか→徐々に詳細）
 4. **都度確認**しながら進める
 5. **視覚的な確認**（「このような流れですね」と整理）
+6. **生成前の最終確認**で要素配置を図示
